@@ -1,0 +1,84 @@
+import time
+import logging
+logging.basicConfig(level=logging.DEBUG)
+from telegram import ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
+
+def start(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Привет! Это приветственное сообщение.")
+
+    time.sleep(8)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Второе сообщение.")
+
+    time.sleep(30)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Третье сообщение.")
+
+    time.sleep(11)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Четвёртое сообщение.")
+
+    time.sleep(60)
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Пятое сообщение.")
+
+    intervals = [30, 25, 10]
+    for interval in intervals:
+        time.sleep(interval)
+        context.bot.send_message(chat_id=update.effective_chat.id, text="Дополнительное сообщение.")
+
+    # Создание основного меню
+    main_menu = ReplyKeyboardMarkup([[KeyboardButton("Об обучении")],
+                                     [KeyboardButton("Связаться с куратором")],
+                                     [KeyboardButton("Оставить заявку")]])
+
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Выберите действие:", reply_markup=main_menu)
+
+
+def about_course(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Краткое описание курса.")
+
+
+def contact_curator(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Контакты куратора:\nТелеграмм: @kurator1\nEmail: curator@example.com")
+
+
+def leave_application(update, context):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Спасибо, я получила твою заявку, отвечу как только освобожусь.")
+
+    # Отправка данных о пользователе на указанный телеграмм аккаунт
+    user_data = update.effective_user
+    context.bot.send_message(chat_id="6020934440", text=f"Новая заявка от пользователя:\n"
+                                                       f"Имя: {user_data.first_name}\n"
+                                                       f"Фамилия: {user_data.last_name}\n"
+                                                       f"Username: {user_data.username}\n"
+                                                       f"ID пользователя: {user_data.id}")
+
+    # Сохранение ников пользователей в файл
+    with open("usernames.txt", "a") as file:
+        file.write(user_data.username + "\n")
+
+
+def main():
+    # Инициализация бота и получение токена
+    updater = Updater(token="6297672123:AAFynxJ2mdHHPxW4JD0uI9N1hr-3TF-XjaI", use_context=True)
+
+    # Получение диспетчера для регистрации обработчиков
+    dispatcher = updater.dispatcher
+
+    # Регистрация обработчиков команд
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(CommandHandler("about_course", about_course))
+    dispatcher.add_handler(CommandHandler("contact_curator", contact_curator))
+    dispatcher.add_handler(CommandHandler("leave_application", leave_application))
+
+    # Регистрация обработчиков кнопок
+    dispatcher.add_handler(MessageHandler(Filters.text("Об обучении"), about_course))
+    dispatcher.add_handler(MessageHandler(Filters.text("Связаться с куратором"), contact_curator))
+    dispatcher.add_handler(MessageHandler(Filters.text("Оставить заявку"), leave_application))
+
+    # Запуск бота
+    updater.start_polling()
+    updater.idle()
+
+
+if __name__ == '__main__':
+    main()
