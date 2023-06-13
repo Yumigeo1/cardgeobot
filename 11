@@ -59,7 +59,7 @@ def leave_application(update, context):
 
 def main():
     # Инициализация бота и получение токена
-    updater = Updater(token="6297672123:AAFynxJ2mdHHPxW4JD0uI9N1hr-3TF-XjaI", use_context=True)
+    updater = Updater(token="YOUR_BOT_TOKEN", use_context=True)
 
     # Получение диспетчера для регистрации обработчиков
     dispatcher = updater.dispatcher
